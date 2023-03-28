@@ -78,6 +78,9 @@ class Vertex(object):
 
         self._incidence[other].add(edge)
 
+    def remove_incidence(self, v: "Vertex"):    
+        self._incidence.pop(v)
+
     @property
     def graph(self) -> "Graph":
         """
