@@ -368,6 +368,23 @@ class Graph(object):
         """
         return v in u.neighbours and (not self.directed
                                       or any(e.head == v for e in u.incidence))
+    
+    def copy(self) -> "Graph":
+        v_dict = {}
+        new_graph = Graph(self.directed, 0)
+        for v in self.vertices:
+            new_v = Vertex(new_graph, v.label)
+            new_graph.add_vertex(new_v)
+            v_dict[v] = new_v
+        for e in self.edges:
+            new_head = v_dict[e.head]
+            new_tail = v_dict[e.tail]
+            new_edge = Edge(new_tail, new_head, e.weight)
+            new_graph.add_edge(new_edge)
+        return new_graph
+
+        
+
 
 
 class UnsafeGraph(Graph):
