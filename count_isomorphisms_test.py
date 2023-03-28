@@ -11,7 +11,6 @@ import sys
 from graph import Graph
 from graph_io import load_graph
 from count_isomorphisms import count_isomorphism, check_isomorphism
-import timeit
 import time
 from preprocessing import count_automorphisms
 
@@ -117,9 +116,8 @@ def count_iso2(graphs : list["Graph"]):
             if are_iso:
                 iso_group.append(j)
                 already_checked[j] = True
-        iso_groups.append((iso_group, count_isomorphism([],[],graphs[i],graphs[i].copy())))
+        iso_groups.append((iso_group, count_automorphisms(graphs[i])))
     return iso_groups
-        
 
 
 if __name__ == "__main__":
