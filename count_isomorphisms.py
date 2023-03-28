@@ -3,11 +3,10 @@ from graph import Graph, Vertex
 
 
 
-def count_isomorphism(D, I, G, H):
+def count_isomorphism(D, I, G, H, alpha):
     # print("count_isomorphism(D={}, I={})".format(D, I))
     vertices = G.vertices + H.vertices
 
-    alpha = {v: 0 for v in vertices}
     alpha.update({v: -i - 1 for i, v in enumerate(D)})
     alpha.update({v: -i - 1 for i, v in enumerate(I)})
 
@@ -26,7 +25,7 @@ def count_isomorphism(D, I, G, H):
     num = 0
     # For each vertex y ∈ C that belongs to H
     for y in (v for v in C if v in H and v not in I):
-        num = num + count_isomorphism(D + [x], I + [y], G, H)
+        num = num + count_isomorphism(D + [x], I + [y], G, H, beta)
     return num
 
 def check_isomorphism(D, I, G, H):
@@ -166,3 +165,4 @@ def is_bijection(colouring, G, H):
     if len(set(colouring_g2.values())) != len(colouring_g2):
         return False
     return True
+
