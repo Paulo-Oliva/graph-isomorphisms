@@ -25,7 +25,7 @@ def count_isomorphism(D, I, G, H, alpha):
     num = 0
     # For each vertex y ∈ C that belongs to H
     for y in (v for v in C if v in H and v not in I):
-        num = num + count_isomorphism(D + [x], I + [y], G, H, beta)
+        num = num + count_isomorphism(D + [x], I + [y], G, H, beta.copy())
     return num
 
 def check_isomorphism(D, I, G, H):
