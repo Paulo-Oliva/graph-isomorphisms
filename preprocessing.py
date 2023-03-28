@@ -11,10 +11,11 @@ def count_automorphisms(G: "Graph"):
     vertices_to_destroy = set()
     coloring = {v: v.degree for v in G.vertices}
     vertices = G.vertices
+    l = len(vertices)
 
     for true_twin in true_twins:
         chosen_idx = true_twin[0]
-        coloring[vertices[chosen_idx]] = len(true_twin) + 5000
+        coloring[vertices[chosen_idx]] = len(true_twin) + l
         for v_idx in true_twin[1:]:
             v = vertices[v_idx]
             for e in v.incidence:
@@ -26,7 +27,7 @@ def count_automorphisms(G: "Graph"):
     
     for false_twin in false_twins:
         chosen_idx = false_twin[0]
-        coloring[vertices[chosen_idx]] = len(false_twin)+ offset + 5000
+        coloring[vertices[chosen_idx]] = len(false_twin)+ offset + l
         for v_idx in false_twin[1:]:
             v = vertices[v_idx]
             for e in v.incidence:
