@@ -10,8 +10,10 @@ import os
 import sys
 from graph import Graph
 from graph_io import load_graph
-from count_isomorphisms import count_isomorphism
+from count_isomorphisms import count_isomorphism, check_isomorphism
 import timeit
+import time
+from preprocessing import count_automorphisms
 
 
 def skip_large(file):
@@ -67,32 +69,57 @@ def print_isomorphisms(path: str):
         # Load the graphs
 
         with open(file.path, "r", encoding="utf-8") as grl:
-            graphs = load_graph(grl, read_list=True)
+            graphs, _nothing = load_graph(grl, read_list=True)
 
         if skip_large(file):
             continue
 
-        already_checked = set()
-        t = timeit.timeit(lambda: count_iso(graphs, already_checked), number=1)
-        print(t)
+        # already_checked = set()
+        # t = timeit.timeit(lambda: count_iso(graphs, already_checked), number=1)
+        start = time.time_ns()
+        result = count_iso2(graphs)
+        stop = time.time_ns()
+        for group, number_of_iso in result:
+            print(group, number_of_iso)
+        print((stop - start)/(10**9), 's')
         print()
 
 
 def count_iso(graphs, already_checked):
-    for i in range(len(graphs[0])):
+    for i in range(len(graphs)):
         to_print = [i]
         ans = 0
-        for j in range(i + 1, len(graphs[0])):
+        for j in range(i + 1, len(graphs)):
             if j in already_checked:
                 continue
                 # print("Checking", i, j)
-            answer = count_isomorphism([], [], graphs[0][i], graphs[0][j])
+            answer = count_isomorphism([], [], graphs[i], graphs[j])
             if answer:
                 to_print.append(j)
                 already_checked.add(j)
                 ans = answer
         if len(to_print) > 1:
             print(to_print, ans)
+
+def count_iso2(graphs : list["Graph"]):
+    already_checked = {g_inx:False for g_inx in range(len(graphs))}
+    iso_groups = []
+    for i in range(len(graphs)):
+        if already_checked[i]:
+            continue
+        already_checked[i] = True
+        iso_group = [i]
+        for j in range(i + 1, len(graphs)):
+            if already_checked[j]:
+                continue
+                # print("Checking", i, j)
+            are_iso = check_isomorphism([], [], graphs[i], graphs[j])
+            if are_iso:
+                iso_group.append(j)
+                already_checked[j] = True
+        iso_groups.append((iso_group, count_isomorphism([],[],graphs[i],graphs[i].copy())))
+    return iso_groups
+        
 
 
 if __name__ == "__main__":
