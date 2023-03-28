@@ -2,6 +2,7 @@ from colour_ref import colour_refinement
 from graph import Graph, Vertex
 
 
+
 def count_isomorphism(D, I, G, H):
     # print("count_isomorphism(D={}, I={})".format(D, I))
     vertices = G.vertices + H.vertices
@@ -26,6 +27,33 @@ def count_isomorphism(D, I, G, H):
     # For each vertex y ∈ C that belongs to H
     for y in (v for v in C if v in H and v not in I):
         num = num + count_isomorphism(D + [x], I + [y], G, H)
+    return num
+
+def check_isomorphism(D, I, G, H):
+    # print("check_isomorphism(D={}, I={})".format(D, I))
+    vertices = G.vertices + H.vertices
+
+    alpha = {v: 0 for v in vertices}
+    alpha.update({v: -i - 1 for i, v in enumerate(D)})
+    alpha.update({v: -i - 1 for i, v in enumerate(I)})
+
+    vertices = [v for v in vertices if v not in D and v not in I]
+    
+    beta = colour_refinement(vertices, alpha)
+    if not is_balanced(beta, G, H):
+        return 0
+    if is_bijection(beta, G, H):
+        # print("+1: D={}, I={}".format(D, I))
+        return 1
+    # Choose a colour class C of beta with |C| ≥ 4
+    C = pick_colour_class(beta)
+    # Choose a vertex x ∈ C that belongs to G
+    x = next(v for v in C if v in G and v not in D)
+    num = 0
+    # For each vertex y ∈ C that belongs to H
+    for y in (v for v in C if v in H and v not in I):
+        if check_isomorphism(D + [x], I + [y], G, H) != 0:
+            return 1
     return num
 
 
