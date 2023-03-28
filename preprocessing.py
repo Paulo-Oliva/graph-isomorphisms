@@ -4,53 +4,59 @@ from math import factorial
 
 
 def count_automorphisms(G: "Graph"):
-    multiplier = 1
     true_twins = calc_true_twins(G)
     false_twins = calc_false_twins(G)
-
+    offset = max([len(true_twin) for true_twin in true_twins]) if len(true_twins) > 0 else 0
     edges_to_destroy = set()
     vertices_to_destroy = set()
-
     coloring = {v: v.degree for v in G.vertices}
-
-    offset = len(true_twins)
+    vertices = G.vertices
 
     for true_twin in true_twins:
-        coloring[true_twin[0]] = len(true_twin)
-        for v in true_twin[1:]:
-            G.vertices[true_twin[0]].pop(G.vertices[v])
-            for e in G.vertices[v].incidence:
+        chosen_idx = true_twin[0]
+        coloring[vertices[chosen_idx]] = len(true_twin) + 5000
+        for v_idx in true_twin[1:]:
+            v = vertices[v_idx]
+            for e in v.incidence:
+                u = e.other_end(v)
+                u.remove_incidence(v)
                 edges_to_destroy.add(e)
-            vertices_to_destroy.add(G.vertices[v])
-            coloring.pop(G.vertices[v])
+            vertices_to_destroy.add(v)
+            coloring.pop(v)
     
     for false_twin in false_twins:
-        coloring[false_twin[0]] = len(false_twin)+ offset
-        for v in false_twin[1:]:
-            for e in G.vertices[v].incidence:
+        chosen_idx = false_twin[0]
+        coloring[vertices[chosen_idx]] = len(false_twin)+ offset + 5000
+        for v_idx in false_twin[1:]:
+            v = vertices[v_idx]
+            for e in v.incidence:
+                u = e.other_end(v)
+                u.remove_incidence(v)
                 edges_to_destroy.add(e)
-            vertices_to_destroy.add(G.vertices[v])
-            coloring.pop(G.vertices[v])
-    if len(edges_to_destroy) > 0:
-        G._e = list(set(G._e).difference(edges_to_destroy))
-    if len(vertices_to_destroy) > 0:
-        G._v = list(set(G._v).difference(vertices_to_destroy))
+            vertices_to_destroy.add(v)
+            coloring.pop(v)
 
-    for true_twin in true_twins:
-        multiplier*=factorial(len(true_twin))
-    for false_twin in false_twins:
-        multiplier*=factorial(len(false_twin))
+    reduce_graph(G, edges_to_destroy, vertices_to_destroy)
+
     G_copy = G.copy()
-
     for i,v in enumerate(G_copy.vertices):
         coloring[v] = coloring[G.vertices[i]]
 
-    result = count_isomorphism([],[],G, G_copy, coloring)
-    
-    return result*multiplier
-        
+    return count_isomorphism([],[],G, G_copy, coloring)*calc_multiplier(true_twins, false_twins)
 
 
+def reduce_graph(G, edges_to_destroy, vertices_to_destroy):
+    G._e = list(set(G._e).difference(edges_to_destroy))
+    G._v = list(set(G._v).difference(vertices_to_destroy))
+
+
+def calc_multiplier(TT, FT):
+    m = 1
+    for true_twin in TT:
+        m*=factorial(len(true_twin))
+    for false_twin in FT:
+        m*=factorial(len(false_twin))
+    return m
 
 def calc_true_twins(G: "Graph"):
     vertices = G.vertices
