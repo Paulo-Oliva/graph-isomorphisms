@@ -9,13 +9,80 @@ from graph import Graph, Vertex
 
 def colour_refinement(vertices: list[Vertex],
                       colouring: dict[Vertex, int]) -> dict[Vertex, int]:
+    
+    colours_to_vertices_dict = create_colours_to_vertices_dict(colouring)
+
+    # standarise colours such that colours occur consequatively v very important
+    min_colour = min(colours_to_vertices_dict.keys())
+    min_colour_initially = min_colour
+    max_colour = max(colours_to_vertices_dict.keys())
+    # is_colour_in_queue = {col : True for col in colours_to_vertices_dict.keys()}
+    queue = list(colours_to_vertices_dict.keys())
+    while len(queue) > 0:
+        refining_colour = queue.pop(0)
+        vertices_with_refining_colour = colours_to_vertices_dict[refining_colour]
+        new_colouring = colouring.copy()
+        prev_max_colour = max_colour
+        for colour in range(min_colour, max_colour+1):
+            
+            vertices = colours_to_vertices_dict[colour]
+            number_of_neighbours_to_colour_dict = {}
+            biggest_colour_class = None
+            len_biggest_colour_class = 0
+            colour_to_number_of_vertices_currently = {}
+            vertex_to_number_dict = {}
+            # refine_on_colour
+            for v in vertices:
+                number =  len(set(v.neighbours).intersection(vertices_with_refining_colour))
+                vertex_to_number_dict[v] = number
+                if number not in number_of_neighbours_to_colour_dict.keys():
+                    max_colour+=1
+                    number_of_neighbours_to_colour_dict[number] = max_colour
+                    colours_to_vertices_dict[max_colour] = {v}
+                    colour_to_number_of_vertices_currently[max_colour] = 1
+                    if biggest_colour_class == None:
+                        biggest_colour_class = max_colour
+                        len_biggest_colour_class = 1
+                    new_colouring[v] = max_colour
+                else:
+                    this_colour = number_of_neighbours_to_colour_dict[number]
+                    colour_to_number_of_vertices_currently[this_colour] += 1
+                    colours_to_vertices_dict[this_colour].add(v)
+                    if colour_to_number_of_vertices_currently[this_colour] > len_biggest_colour_class:
+                        biggest_colour_class = this_colour
+                        len_biggest_colour_class = colour_to_number_of_vertices_currently[this_colour]
+                    new_colouring[v] = this_colour
+            for new_colour in set(number_of_neighbours_to_colour_dict.values()): # new min_colour and max_colour range
+                if new_colour != biggest_colour_class:
+                    queue.insert(0,new_colour)
+        min_colour = prev_max_colour + 1
+        colouring = new_colouring
+    
+    for v in colouring:
+        colouring[v] -= (min_colour-min_colour_initially)
+            
+    return colouring
+
+
+def create_colours_to_vertices_dict(colouring: dict[Vertex, int]) -> dict[int, set[Vertex]]:
+    colours_to_vertices_dict = {}
+    for v, col in colouring.items():
+        if col not in colours_to_vertices_dict.keys():
+            colours_to_vertices_dict[col] = {v}
+        else:
+            colours_to_vertices_dict[col].add(v)
+    return colours_to_vertices_dict
+    
+
+def colour_refinement_1(vertices: list[Vertex],
+                      colouring: dict[Vertex, int]) -> dict[Vertex, int]:
     """
-    This function implements the colour refinement algorithm described in
+    This function implements the colour refinement algorithm described in`
     the slides of the lecture. The main difference is that this function
     takes a list of vertices instead of a graph, instead of the graph itself.
     This allows us to run the algorithm on two graphs at the same time more
     easily, and thus, check if they are isomorphic.
-
+`
     Args:
         vertices (list[Vertex]): A list of the vertices of the graph(s).
 

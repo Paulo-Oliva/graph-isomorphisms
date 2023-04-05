@@ -6,16 +6,30 @@ from math import factorial
 def count_automorphisms(G: "Graph"):
     true_twins = calc_true_twins(G)
     false_twins = calc_false_twins(G)
-    offset = max([len(true_twin) for true_twin in true_twins]) if len(true_twins) > 0 else 0
+    colour_counter = 0
+    len_of_true_family_to_colour_dict = {}
+
+    for true_twin in true_twins:
+        len_f = len(true_twin)
+        if len_f not in len_of_true_family_to_colour_dict.keys():
+            colour_counter += 1
+            len_of_true_family_to_colour_dict[len_f] = colour_counter
+    len_of_false_family_to_colour_dict = {}
+    for false_twin in false_twins:
+        len_f = len(false_twin)
+        if len_f not in len_of_false_family_to_colour_dict.keys():
+            colour_counter += 1
+            len_of_false_family_to_colour_dict[len_f] = colour_counter
+
+
     edges_to_destroy = set()
     vertices_to_destroy = set()
-    coloring = {v: v.degree for v in G.vertices}
+    coloring = {v: 0 for v in G.vertices}
     vertices = G.vertices
-    l = len(vertices)
 
     for true_twin in true_twins:
         chosen_idx = true_twin[0]
-        coloring[vertices[chosen_idx]] = len(true_twin) + l
+        coloring[vertices[chosen_idx]] = len_of_true_family_to_colour_dict[len(true_twin)]
         for v_idx in true_twin[1:]:
             v = vertices[v_idx]
             for e in v.incidence:
@@ -27,7 +41,7 @@ def count_automorphisms(G: "Graph"):
     
     for false_twin in false_twins:
         chosen_idx = false_twin[0]
-        coloring[vertices[chosen_idx]] = len(false_twin)+ offset + l
+        coloring[vertices[chosen_idx]] = len_of_false_family_to_colour_dict[len(false_twin)]
         for v_idx in false_twin[1:]:
             v = vertices[v_idx]
             for e in v.incidence:
