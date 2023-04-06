@@ -1,7 +1,7 @@
-from graph_io import load_graph
+import pytest
 
 from count_isomorphisms_test import count_iso
-import pytest
+from graph_io import load_graph
 
 
 def _count_iso(name, expected_groups):

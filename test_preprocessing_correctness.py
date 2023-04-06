@@ -1,5 +1,7 @@
-from graph import Graph, Vertex, Edge
-from preprocessing import count_automorphisms, calc_true_twins, calc_false_twins, check_neighbourhood_TT, check_neighbourhood_FT
+from graph import Edge, Graph, Vertex
+from preprocessing import (calc_false_twins, calc_true_twins,
+                           check_neighbourhood_FT, check_neighbourhood_TT,
+                           count_automorphisms)
 
 
 def test_calc_TT_and_FT():
