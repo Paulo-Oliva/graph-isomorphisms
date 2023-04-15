@@ -7,7 +7,7 @@ class Node:
         self.data = data
         self.next: Node | None = None
         self.prev: Node | None = None
-    
+
     def __str__(self):
         return str(self.data)
 
@@ -33,6 +33,15 @@ class DoublyLinkedList:
         # return a pointer to the new node
         return new_node
 
+    def append_node(self, node: Node):
+        if self.head is None:
+            self.head = node
+            self.tail = node
+        else:
+            node.prev = self.tail
+            self.tail.next = node
+            self.tail = node
+
     def remove(self, node: Node):
         if node.prev is None:
             self.head = node.next
@@ -43,6 +52,9 @@ class DoublyLinkedList:
             self.tail = node.prev
         else:
             node.next.prev = node.prev
+            
+        node.next = None
+        node.prev = None
 
     def is_empty(self):
         return self.head is None

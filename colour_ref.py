@@ -104,7 +104,7 @@ def create_colours_to_vertices_dict(
     return colours_to_vertices_dict
 
 
-def colour_refinement(vertices: list[Vertex],
+def colour_refinement2(vertices: list[Vertex],
                       colouring: dict[Vertex, int]) -> dict[Vertex, int]:
     """
     This function implements the colour refinement algorithm described in`
@@ -222,33 +222,43 @@ def is_discrete_colouring(colouring: dict[Vertex, int]) -> bool:
 
 def colour_refinement(vertices: list[Vertex],
                       colouring: dict[Vertex, int]) -> dict[Vertex, int]:
+    
+    
     colour_classes, vertex_to_node = colouring_to_colour_classes_and_vertex_to_node(
         colouring)
-    adjacency_list = create_adjacency_list(vertices)
+    
+    if len(colour_classes) == 1:
+        return colouring
+    
+    
+    
+    # adjacency_list = create_adjacency_list(list(colouring.keys()))
     # Initialize queue with the first colour class
     queue = deque()
-    queue.append(max(colour_classes.keys()))
+    for c in colour_classes.keys():
+        queue.append(c)
 
     # a boolean variable InQueue[i] that indicates whether color i is in Queue
-    in_queue = [False] * len(colour_classes)
-    in_queue[0] = True
+    in_queue = {c: True for c in colour_classes.keys()}
+    # in_queue[max(colour_classes.keys())] = True
 
     while queue:
         # Pop the first colour class from the queue
         C = queue.popleft()
+        in_queue[C] = False
         # In time O(t), loop over all vertices in the colour class and vertices that are adjacent to them
         # and compute A list L of all colors i such that Ci contains a vertex adjacent to a vertex in C
         # The number A[i] of such states in Ci is also computed
         L = set()
         A = {}
         for v in colour_classes[C]:
-            neighbours = adjacency_list[v]
+            neighbours = v.neighbours
             for n in neighbours:
                 L.add(colouring[n])
-                if colouring[n] not in A:
-                    A[colouring[n]] = 1
+                if A.get(colouring[n]) == None:
+                    A[colouring[n]] = {n}
                 else:
-                    A[colouring[n]] += 1
+                    A[colouring[n]].add(n)
 
         # In time O(|L|) ≤ O(t), loop over L and compute:
         # • for each i ∈ L: whether Ci should split up (whether A[i] < |Ci|).
@@ -257,26 +267,15 @@ def colour_refinement(vertices: list[Vertex],
         # • If i in Queue: add l to the queue.
         # • If i not in Queue: add either i or l to the queue, depending on which of the new color classes is the smallest.
         for i in L:
-            if A[i] < len(colour_classes[i]):
-                l = len(colour_classes)
+            if len(A[i]) < len(colour_classes[i]):
+                l = max(colour_classes.keys()) + 1
                 colour_classes[l] = DoublyLinkedList()
                 print("Splitting up colour class", i, "into", i, "and", l)
 
-                # Split up the colour class
-                for v in colour_classes[i]:
-                    if colouring[v] == i:
-                        if A[i] > 0:
-                            colour_classes[i].remove(vertex_to_node[v])
-                            colour_classes[l].append(v)
-                            A[i] -= 1
-                        else:
-                            colour_classes[i].remove(vertex_to_node[v])
-                            colour_classes[i].append(v)
-                    else:
-                        colour_classes[l].append(v)
-
-                # Update the colouring
-                for v in colour_classes[l]:
+                for v in A[i]:
+                    node = vertex_to_node[v]
+                    colour_classes[i].remove(node)
+                    colour_classes[l].append_node(node)
                     colouring[v] = l
 
                 # Update the queue
@@ -287,9 +286,12 @@ def colour_refinement(vertices: list[Vertex],
                     if len(colour_classes[i]) < len(colour_classes[l]):
                         queue.append(i)
                         in_queue[i] = True
+                        in_queue[l] = False
                     else:
                         queue.append(l)
                         in_queue[l] = True
+                        in_queue[i] = False
+
     return colouring
 
 
@@ -317,15 +319,25 @@ def colouring_to_colour_classes_and_vertex_to_node(
 
 
 if __name__ == "__main__":
-    G = Graph(directed=False, n=5)
+    G = Graph(directed=False, n=8)
     G.add_edge(edge=Edge(G.vertices[0], G.vertices[1]))
-    G.add_edge(edge=Edge(G.vertices[0], G.vertices[2]))
-    G.add_edge(edge=Edge(G.vertices[0], G.vertices[3]))
+    G.add_edge(edge=Edge(G.vertices[1], G.vertices[2]))
+    G.add_edge(edge=Edge(G.vertices[2], G.vertices[3]))
+    G.add_edge(edge=Edge(G.vertices[1], G.vertices[3]))
     G.add_edge(edge=Edge(G.vertices[0], G.vertices[4]))
+    G.add_edge(edge=Edge(G.vertices[5], G.vertices[4]))
+    G.add_edge(edge=Edge(G.vertices[5], G.vertices[6]))
+    G.add_edge(edge=Edge(G.vertices[5], G.vertices[7]))
+    G.add_edge(edge=Edge(G.vertices[6], G.vertices[7]))
+    G.add_edge(edge=Edge(G.vertices[4], G.vertices[7]))
 
-    print(colour_refinement(G.vertices, {v: 0 for v in G.vertices}))
+    # colr = {v: 0 for v in G.vertices}
+    # colr.update({G.vertices[1]: 1})
+    # colr.update({G.vertices[6]: 1})
 
-    # with open("cr_tests/cref9vert_4_9.grl", "r") as f:
-    #     graphs = load_graph(f, read_list=True)
-    #     G = graphs[0][0]
-    #     print(colour_refinement(G.vertices, {v: 0 for v in G.vertices}))
+    # print(colour_refinement(G.vertices, colr))
+
+    with open("cr_tests/cref9vert_4_9.grl", "r") as f:
+        graphs = load_graph(f, read_list=True)
+        G = graphs[0][0]
+        print(colour_refinement(G.vertices, {v: v.degree for v in G.vertices}))
