@@ -44,7 +44,7 @@ class Vertex(object):
         self.label = label
         self._incidence = {}
 
-    def __repr__(self):
+    def __str__(self):
         """
         A programmer-friendly representation of the vertex.
         :return: The string to approximate the constructor arguments of the `Vertex'
@@ -52,7 +52,7 @@ class Vertex(object):
         return 'Vertex(label={}, #incident={})'.format(self.label,
                                                        len(self._incidence))
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """
         A user-friendly representation of the vertex, that is, its label.
         :return: The string representation of the label.

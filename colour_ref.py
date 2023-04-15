@@ -2,69 +2,99 @@
 This module contains an implementation of the colour refinement algorithm
 and a function to check if two graphs are isomorphic.
 """
-# Paulo Oliva
 
-from graph import Graph, Vertex
+from collections import deque
+
+from doubly_linked_list import DoublyLinkedList, Node
+from graph import Edge, Graph, Vertex
+from graph_io import load_graph
 
 
-def colour_refinement(vertices: list[Vertex],
-                      colouring: dict[Vertex, int]) -> dict[Vertex, int]:
-    
+def colour_refinement__(vertices: list[Vertex],
+                        colouring: dict[Vertex, int]) -> dict[Vertex, int]:
+    # Create a dictionary that maps colours to the vertices that have that colour
     colours_to_vertices_dict = create_colours_to_vertices_dict(colouring)
-
-    # standarise colours such that colours occur consequatively v very important
+    # Standardize the colours so that the colours are 1, 2, 3, ...
     min_colour = min(colours_to_vertices_dict.keys())
     min_colour_initially = min_colour
     max_colour = max(colours_to_vertices_dict.keys())
-    # is_colour_in_queue = {col : True for col in colours_to_vertices_dict.keys()}
+    # Create a queue of colours to refine on
     queue = list(colours_to_vertices_dict.keys())
+    # While there are still colours to refine on
     while len(queue) > 0:
+        # Get the next colour to refine on
         refining_colour = queue.pop(0)
-        vertices_with_refining_colour = colours_to_vertices_dict[refining_colour]
+        # Get the vertices that have that colour
+        vertices_with_refining_colour = colours_to_vertices_dict[
+            refining_colour]
+        # Create a new colouring
         new_colouring = colouring.copy()
         prev_max_colour = max_colour
-        for colour in range(min_colour, max_colour+1):
-            
+        # For each colour in the colouring
+        for colour in range(min_colour, max_colour + 1):
+            # Get the vertices that have that colour
             vertices = colours_to_vertices_dict[colour]
+            # Initialise the dictionary that maps the number of neighbours of a vertex to the colour of that vertex
             number_of_neighbours_to_colour_dict = {}
             biggest_colour_class = None
             len_biggest_colour_class = 0
+            # Initialise the dictionary that maps the colour to the number of vertices that have that colour
             colour_to_number_of_vertices_currently = {}
             vertex_to_number_dict = {}
-            # refine_on_colour
+            # For each vertex in the vertices that have the colour
             for v in vertices:
-                number =  len(set(v.neighbours).intersection(vertices_with_refining_colour))
+                # Get the number of neighbours of that vertex that have the refining colour
+                number = len(
+                    set(v.neighbours).intersection(
+                        vertices_with_refining_colour))
+                # Add the number to the dictionary
                 vertex_to_number_dict[v] = number
+                # If the number is not in the dictionary that maps the number of neighbours to the colour
                 if number not in number_of_neighbours_to_colour_dict.keys():
-                    max_colour+=1
+                    # Create a new colour
+                    max_colour += 1
                     number_of_neighbours_to_colour_dict[number] = max_colour
+                    # Add the vertex to the dictionary that maps the colour to the vertices that have that colour
                     colours_to_vertices_dict[max_colour] = {v}
                     colour_to_number_of_vertices_currently[max_colour] = 1
+                    # If the biggest colour class is None, set it to the new colour
                     if biggest_colour_class == None:
                         biggest_colour_class = max_colour
                         len_biggest_colour_class = 1
+                    # Set the colour of the vertex to the new colour
                     new_colouring[v] = max_colour
+                # If the number is in the dictionary that maps the number of neighbours to the colour
                 else:
                     this_colour = number_of_neighbours_to_colour_dict[number]
                     colour_to_number_of_vertices_currently[this_colour] += 1
                     colours_to_vertices_dict[this_colour].add(v)
-                    if colour_to_number_of_vertices_currently[this_colour] > len_biggest_colour_class:
+                    # If the number of vertices that have the colour is bigger than the biggest colour class
+                    # Set the biggest colour class to the new colour
+                    if colour_to_number_of_vertices_currently[
+                            this_colour] > len_biggest_colour_class:
                         biggest_colour_class = this_colour
-                        len_biggest_colour_class = colour_to_number_of_vertices_currently[this_colour]
+                        len_biggest_colour_class = colour_to_number_of_vertices_currently[
+                            this_colour]
+                    # Set the colour of the vertex to the colour
                     new_colouring[v] = this_colour
-            for new_colour in set(number_of_neighbours_to_colour_dict.values()): # new min_colour and max_colour range
+            # For each colour in the dictionary that maps the number of neighbours to the colour
+            for new_colour in set(
+                    number_of_neighbours_to_colour_dict.values()):
+                # If the colour is not the biggest colour class
                 if new_colour != biggest_colour_class:
-                    queue.insert(0,new_colour)
+                    # Add the colour to the queue
+                    queue.append(new_colour)
+        # Set the colouring to the new colouring
         min_colour = prev_max_colour + 1
         colouring = new_colouring
-    
+    # Standardize the colours so that the colours are 1, 2, 3, ...
     for v in colouring:
-        colouring[v] -= (min_colour-min_colour_initially)
-            
+        colouring[v] -= (min_colour - min_colour_initially)
     return colouring
 
 
-def create_colours_to_vertices_dict(colouring: dict[Vertex, int]) -> dict[int, set[Vertex]]:
+def create_colours_to_vertices_dict(
+        colouring: dict[Vertex, int]) -> dict[int, set[Vertex]]:
     colours_to_vertices_dict = {}
     for v, col in colouring.items():
         if col not in colours_to_vertices_dict.keys():
@@ -72,9 +102,9 @@ def create_colours_to_vertices_dict(colouring: dict[Vertex, int]) -> dict[int, s
         else:
             colours_to_vertices_dict[col].add(v)
     return colours_to_vertices_dict
-    
 
-def colour_refinement_1(vertices: list[Vertex],
+
+def colour_refinement(vertices: list[Vertex],
                       colouring: dict[Vertex, int]) -> dict[Vertex, int]:
     """
     This function implements the colour refinement algorithm described in`
@@ -82,7 +112,7 @@ def colour_refinement_1(vertices: list[Vertex],
     takes a list of vertices instead of a graph, instead of the graph itself.
     This allows us to run the algorithm on two graphs at the same time more
     easily, and thus, check if they are isomorphic.
-`
+
     Args:
         vertices (list[Vertex]): A list of the vertices of the graph(s).
 
@@ -188,3 +218,114 @@ def is_discrete_colouring(colouring: dict[Vertex, int]) -> bool:
     vertex_amount = len(colouring.keys())
     # Return whether the number of colours is equal to the number of vertices
     return colour_amount == vertex_amount
+
+
+def colour_refinement(vertices: list[Vertex],
+                      colouring: dict[Vertex, int]) -> dict[Vertex, int]:
+    colour_classes, vertex_to_node = colouring_to_colour_classes_and_vertex_to_node(
+        colouring)
+    adjacency_list = create_adjacency_list(vertices)
+    # Initialize queue with the first colour class
+    queue = deque()
+    queue.append(max(colour_classes.keys()))
+
+    # a boolean variable InQueue[i] that indicates whether color i is in Queue
+    in_queue = [False] * len(colour_classes)
+    in_queue[0] = True
+
+    while queue:
+        # Pop the first colour class from the queue
+        C = queue.popleft()
+        # In time O(t), loop over all vertices in the colour class and vertices that are adjacent to them
+        # and compute A list L of all colors i such that Ci contains a vertex adjacent to a vertex in C
+        # The number A[i] of such states in Ci is also computed
+        L = set()
+        A = {}
+        for v in colour_classes[C]:
+            neighbours = adjacency_list[v]
+            for n in neighbours:
+                L.add(colouring[n])
+                if colouring[n] not in A:
+                    A[colouring[n]] = 1
+                else:
+                    A[colouring[n]] += 1
+
+        # In time O(|L|) ≤ O(t), loop over L and compute:
+        # • for each i ∈ L: whether Ci should split up (whether A[i] < |Ci|).
+        # • if so, choose a new color l, and update Queue by adding i or l.
+        # Whenever a refining operation splits a color class Ci into two new classes: One of them keeps color i, and the other receives the smallest unused color l
+        # • If i in Queue: add l to the queue.
+        # • If i not in Queue: add either i or l to the queue, depending on which of the new color classes is the smallest.
+        for i in L:
+            if A[i] < len(colour_classes[i]):
+                l = len(colour_classes)
+                colour_classes[l] = DoublyLinkedList()
+                print("Splitting up colour class", i, "into", i, "and", l)
+
+                # Split up the colour class
+                for v in colour_classes[i]:
+                    if colouring[v] == i:
+                        if A[i] > 0:
+                            colour_classes[i].remove(vertex_to_node[v])
+                            colour_classes[l].append(v)
+                            A[i] -= 1
+                        else:
+                            colour_classes[i].remove(vertex_to_node[v])
+                            colour_classes[i].append(v)
+                    else:
+                        colour_classes[l].append(v)
+
+                # Update the colouring
+                for v in colour_classes[l]:
+                    colouring[v] = l
+
+                # Update the queue
+                if in_queue[i]:
+                    queue.append(l)
+                    in_queue[l] = True
+                else:
+                    if len(colour_classes[i]) < len(colour_classes[l]):
+                        queue.append(i)
+                        in_queue[i] = True
+                    else:
+                        queue.append(l)
+                        in_queue[l] = True
+    return colouring
+
+
+def create_adjacency_list(
+        vertices: list[Vertex]) -> dict[Vertex, DoublyLinkedList]:
+    adjacency_list: dict[Vertex, DoublyLinkedList] = {}
+    for v in vertices:
+        adjacency_list[v] = DoublyLinkedList()
+        for n in v.neighbours:
+            adjacency_list[v].append(n)
+    return adjacency_list
+
+
+def colouring_to_colour_classes_and_vertex_to_node(
+    colouring: dict[Vertex, int]
+) -> tuple[dict[int, DoublyLinkedList], dict[Vertex, Node]]:
+    colour_classes: dict[int, DoublyLinkedList] = {}
+    vertex_to_node: dict[Vertex, Node] = {}
+    for v, c in colouring.items():
+        if c not in colour_classes:
+            colour_classes[c] = DoublyLinkedList()
+        n = colour_classes[c].append(v)
+        vertex_to_node[v] = n
+    return colour_classes, vertex_to_node
+
+
+if __name__ == "__main__":
+    G = Graph(directed=False, n=5)
+    G.add_edge(edge=Edge(G.vertices[0], G.vertices[1]))
+    G.add_edge(edge=Edge(G.vertices[0], G.vertices[2]))
+    G.add_edge(edge=Edge(G.vertices[0], G.vertices[3]))
+    G.add_edge(edge=Edge(G.vertices[0], G.vertices[4]))
+
+    print(colour_refinement(G.vertices, {v: 0 for v in G.vertices}))
+
+    # with open("cr_tests/cref9vert_4_9.grl", "r") as f:
+    #     graphs = load_graph(f, read_list=True)
+    #     G = graphs[0][0]
+    #     print(colour_refinement(G.vertices, {v: 0 for v in G.vertices}))

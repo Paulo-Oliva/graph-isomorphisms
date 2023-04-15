@@ -2,8 +2,8 @@ from colour_ref import colour_refinement
 from graph import Graph, Vertex
 
 
-
-def count_isomorphism(D, I, G, H, alpha):
+def count_isomorphism(D: list[Vertex], I: list[Vertex], G: Graph, H: Graph,
+                      alpha: dict[Vertex, int]) -> int:
     # print("count_isomorphism(D={}, I={})".format(D, I))
     vertices = G.vertices + H.vertices
 
@@ -11,7 +11,7 @@ def count_isomorphism(D, I, G, H, alpha):
     alpha.update({v: -i - 1 for i, v in enumerate(I)})
 
     vertices = [v for v in vertices if v not in D and v not in I]
-    
+
     beta = colour_refinement(vertices, alpha)
     if not is_balanced(beta, G, H):
         return 0
@@ -28,7 +28,9 @@ def count_isomorphism(D, I, G, H, alpha):
         num = num + count_isomorphism(D + [x], I + [y], G, H, beta.copy())
     return num
 
-def check_isomorphism(D, I, G, H):
+
+def check_isomorphism(D: list[Vertex], I: list[Vertex], G: Graph,
+                      H: Graph) -> int:
     # print("check_isomorphism(D={}, I={})".format(D, I))
     vertices = G.vertices + H.vertices
 
@@ -37,7 +39,7 @@ def check_isomorphism(D, I, G, H):
     alpha.update({v: -i - 1 for i, v in enumerate(I)})
 
     vertices = [v for v in vertices if v not in D and v not in I]
-    
+
     beta = colour_refinement(vertices, alpha)
     if not is_balanced(beta, G, H):
         return 0
@@ -165,4 +167,3 @@ def is_bijection(colouring, G, H):
     if len(set(colouring_g2.values())) != len(colouring_g2):
         return False
     return True
-
