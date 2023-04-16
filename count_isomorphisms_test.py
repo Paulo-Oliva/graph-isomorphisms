@@ -35,13 +35,16 @@ def print_isomorphisms(path: str):
     """
     files = os.scandir(path)
     for file in files:
+        if not file.name.startswith("tree"):
+            continue
+
         print(file.name)
         # Load the graphs
         with open(file.path, "r", encoding="utf-8") as grl:
             graphs, _ = load_graph(grl, read_list=True)
 
-        if skip_large(file):
-            continue
+        # if skip_large(file):
+        #     continue
 
         t = timeit.timeit(lambda: print_result(count_iso(graphs)), number=1)
         print(t, "s", sep="")
@@ -54,6 +57,8 @@ def print_result(result):
 
 
 def count_iso(graphs: list[Graph]) -> list[tuple[list[int], int]]:
+    # Preprocess z
+
     already_checked = {g_inx: False for g_inx in range(len(graphs))}
     iso_groups = []
     for i in range(len(graphs)):

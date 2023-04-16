@@ -50,12 +50,14 @@ def print_iso(filename):
 
 
 if __name__ == '__main__':
-    # print_isomorphisms("benchmarks/final_test/iso_auto_tests")
+    print_isomorphisms("benchmarks/final_test/iso_auto_tests")
 
     print(timeit(lambda: print_aut("basicAut1.gr"), number=1), "\n", sep="s")
 
-    # print(timeit(lambda: print_aut("basicAut2.gr"), number=1), "\n", sep="s")
+    print(timeit(lambda: print_aut("basicAut2.gr"), number=1), "\n", sep="s")
 
-    # print(timeit(lambda: print_iso("basicGI1.grl"), number=1), "\n", sep="s")
-    # print(timeit(lambda: print_iso("basicGI2.grl"), number=1), "\n", sep="s")
-    # print(timeit(lambda: print_iso("basicGI3.grl"), number=1), "\n", sep="s")
+    print(timeit(lambda: print_iso("basicGI1.grl"), number=1), "\n", sep="s")
+    print(timeit(lambda: print_iso("basicGI2.grl"), number=1), "\n", sep="s")
+    print(timeit(lambda: print_iso("basicGI3.grl"), number=1), "\n", sep="s")
+
+    # print_isomorphisms("benchmarks/cref/")

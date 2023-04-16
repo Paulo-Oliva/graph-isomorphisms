@@ -20,8 +20,9 @@ class DoublyLinkedList:
     def __init__(self):
         self.head: Node | None = None
         self.tail: Node | None = None
+        self.size = 0
 
-    def append(self, data: Vertex):
+    def append_vertex(self, data: Vertex):
         new_node = Node(data)
         if self.head is None:
             self.head = new_node
@@ -30,7 +31,9 @@ class DoublyLinkedList:
             new_node.prev = self.tail
             self.tail.next = new_node
             self.tail = new_node
-        # return a pointer to the new node
+
+        self.size += 1
+
         return new_node
 
     def append_node(self, node: Node):
@@ -42,6 +45,8 @@ class DoublyLinkedList:
             self.tail.next = node
             self.tail = node
 
+        self.size += 1
+
     def remove(self, node: Node):
         if node.prev is None:
             self.head = node.next
@@ -52,9 +57,11 @@ class DoublyLinkedList:
             self.tail = node.prev
         else:
             node.next.prev = node.prev
-            
-        node.next = None
+
         node.prev = None
+        node.next = None
+
+        self.size -= 1
 
     def is_empty(self):
         return self.head is None
@@ -66,7 +73,7 @@ class DoublyLinkedList:
             node = node.next
 
     def __len__(self):
-        return len(list(iter(self)))
+        return self.size
 
     def __str__(self):
         return str(list(iter(self)))
