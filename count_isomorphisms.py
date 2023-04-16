@@ -29,12 +29,11 @@ def count_isomorphism(D: list[Vertex], I: list[Vertex], G: Graph, H: Graph,
     return num
 
 
-def check_isomorphism(D: list[Vertex], I: list[Vertex], G: Graph,
-                      H: Graph) -> int:
+def check_isomorphism(D: list[Vertex], I: list[Vertex], G: Graph, H: Graph,
+                      alpha: dict[Vertex, int]) -> int:
     # print("check_isomorphism(D={}, I={})".format(D, I))
     vertices = G.vertices + H.vertices
 
-    alpha = {v: 0 for v in vertices}
     alpha.update({v: -i - 1 for i, v in enumerate(D)})
     alpha.update({v: -i - 1 for i, v in enumerate(I)})
 
@@ -53,7 +52,7 @@ def check_isomorphism(D: list[Vertex], I: list[Vertex], G: Graph,
     num = 0
     # For each vertex y ∈ C that belongs to H
     for y in (v for v in C if v in H and v not in I):
-        if check_isomorphism(D + [x], I + [y], G, H) != 0:
+        if check_isomorphism(D + [x], I + [y], G, H, beta.copy()) != 0:
             return 1
     return num
 

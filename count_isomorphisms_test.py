@@ -6,7 +6,7 @@ import os
 import sys
 import timeit
 
-from count_isomorphisms import check_isomorphism, count_isomorphism
+from count_isomorphisms import check_isomorphism
 from graph import Graph
 from graph_io import load_graph
 from preprocessing import count_automorphisms
@@ -35,7 +35,7 @@ def print_isomorphisms(path: str):
     """
     files = os.scandir(path)
     for file in files:
-        if not file.name.startswith("tree"):
+        if not file.name.endswith(".grl"):
             continue
 
         print(file.name)
@@ -70,7 +70,10 @@ def count_iso(graphs: list[Graph]) -> list[tuple[list[int], int]]:
             if already_checked[j]:
                 continue
                 # print("Checking", i, j)
-            are_iso = check_isomorphism([], [], graphs[i], graphs[j])
+            are_iso = check_isomorphism(
+                [], [], graphs[i], graphs[j],
+                {v: v.degree
+                 for v in graphs[i].vertices + graphs[j].vertices})
             if are_iso:
                 iso_group.append(j)
                 already_checked[j] = True
