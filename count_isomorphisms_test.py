@@ -24,7 +24,7 @@ def skip_large(file):
         return True
 
 
-def print_isomorphisms(path: str):
+def print_iso_auto(path: str):
     """
     This function prints the possible isomorphisms in all the graphs in a
     directory of .grl files. The directory is specified by the path
@@ -57,8 +57,6 @@ def print_result(result):
 
 
 def count_iso(graphs: list[Graph]) -> list[tuple[list[int], int]]:
-    # Preprocess z
-
     already_checked = {g_inx: False for g_inx in range(len(graphs))}
     iso_groups = []
     for i in range(len(graphs)):
@@ -86,4 +84,4 @@ if __name__ == "__main__":
     # Default to "graphs"
     PATH = sys.argv[1] if len(sys.argv) > 1 else "graphs"
     # Iterate over all files
-    print_isomorphisms(PATH)
+    print_iso_auto(PATH)
