@@ -1,5 +1,6 @@
 from colour_ref import colour_refinement
 from graph import Edge, Graph, Vertex
+import pytest
 
 
 def same_group(colouring: dict[Vertex, int], vertices: list[Vertex]):
@@ -52,7 +53,9 @@ def test_three_nodes_one_edge_01():
     e0 = Edge(v0, v1)
     G.add_edge(e0)
 
-    result_coloring = colour_refinement(G.vertices, {v: 0 for v in G.vertices})
+    result_coloring = colour_refinement(G.vertices,
+                                        {v: v.degree
+                                         for v in G.vertices})
     assert result_coloring[v0] == result_coloring[v1]
     assert result_coloring[v2] != result_coloring[v1]
     assert result_coloring[v2] != result_coloring[v0]
@@ -69,7 +72,9 @@ def test_three_nodes_one_edge_02():
     e0 = Edge(v0, v2)
     G.add_edge(e0)
 
-    result_coloring = colour_refinement(G.vertices, {v: 0 for v in G.vertices})
+    result_coloring = colour_refinement(G.vertices,
+                                        {v: v.degree
+                                         for v in G.vertices})
     assert result_coloring[v0] == result_coloring[v2]
     assert result_coloring[v1] != result_coloring[v2]
     assert result_coloring[v1] != result_coloring[v0]
@@ -86,7 +91,9 @@ def test_three_nodes_one_edge_12():
     e0 = Edge(v1, v2)
     G.add_edge(e0)
 
-    result_coloring = colour_refinement(G.vertices, {v: 0 for v in G.vertices})
+    result_coloring = colour_refinement(G.vertices,
+                                        {v: v.degree
+                                         for v in G.vertices})
     assert result_coloring[v1] == result_coloring[v2]
     assert result_coloring[v0] != result_coloring[v1]
     assert result_coloring[v0] != result_coloring[v2]
@@ -105,7 +112,9 @@ def test_three_nodes_two_edges():
     G.add_edge(e0)
     G.add_edge(e1)
 
-    result_coloring = colour_refinement(G.vertices, {v: 0 for v in G.vertices})
+    result_coloring = colour_refinement(G.vertices,
+                                        {v: v.degree
+                                         for v in G.vertices})
     assert result_coloring[v0] == result_coloring[v2]
     assert result_coloring[v1] != result_coloring[v2]
     assert result_coloring[v1] != result_coloring[v0]
@@ -198,7 +207,9 @@ def test_five_nodes_triangle_with_legs():
     G.add_edge(e2)
     G.add_edge(e3)
     G.add_edge(e4)
-    result_coloring = colour_refinement(G.vertices, {v: 0 for v in G.vertices})
+    result_coloring = colour_refinement(G.vertices,
+                                        {v: v.degree
+                                         for v in G.vertices})
     assert same_group(result_coloring, [v1, v3])
     assert same_group(result_coloring, [v2, v4])
     assert not same_group(result_coloring, [v0, v3])

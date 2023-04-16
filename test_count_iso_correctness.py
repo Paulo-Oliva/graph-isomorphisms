@@ -5,7 +5,7 @@ from graph_io import load_graph
 
 
 def _count_iso(name, expected_groups):
-    path = "./graphs/" + name
+    path = "./test_graphs/graphs/" + name
     with open(path, "r", encoding="utf-8") as grl:
         graphs, _ = load_graph(grl, read_list=True)
     result = count_iso(graphs)
