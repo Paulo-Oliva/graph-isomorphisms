@@ -1,5 +1,5 @@
-from colour_ref import colour_refinement
-from graph import Graph, Vertex
+from .colour_ref import colour_refinement
+from .graph import Graph, Vertex
 
 
 def count_isomorphism(D: list[Vertex], I: list[Vertex], G: Graph, H: Graph,

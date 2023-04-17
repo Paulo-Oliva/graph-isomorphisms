@@ -5,8 +5,8 @@ and a function to check if two graphs are isomorphic.
 
 from collections import deque
 
-from doubly_linked_list import DoublyLinkedList, Node
-from graph import Graph, Vertex
+from .doubly_linked_list import DoublyLinkedList, Node
+from .graph import Graph, Vertex
 
 
 def create_colours_to_vertices_dict(

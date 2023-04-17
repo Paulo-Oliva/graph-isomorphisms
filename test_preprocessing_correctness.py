@@ -1,5 +1,5 @@
-from graph import Edge, Graph, Vertex
-from preprocessing import (calc_false_twins, calc_true_twins,
+from src.graph import Edge, Graph, Vertex
+from src.preprocessing import (calc_false_twins, calc_true_twins,
                            check_neighbourhood_FT, check_neighbourhood_TT,
                            count_automorphisms)
 

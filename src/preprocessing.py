@@ -1,7 +1,7 @@
 from math import factorial
 
-from count_isomorphisms import count_isomorphism
-from graph import *
+from .count_isomorphisms import count_isomorphism
+from .graph import *
 
 
 def count_automorphisms(G: Graph) -> int:

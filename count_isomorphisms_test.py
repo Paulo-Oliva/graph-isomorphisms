@@ -6,10 +6,10 @@ import os
 import sys
 import timeit
 
-from count_isomorphisms import check_isomorphism
-from graph import Graph
-from graph_io import load_graph
-from preprocessing import count_automorphisms
+from src.count_isomorphisms import check_isomorphism
+from src.graph import Graph
+from src.graph_io import load_graph
+from src.preprocessing import count_automorphisms
 
 
 def skip_large(file):
@@ -82,6 +82,6 @@ def count_iso(graphs: list[Graph]) -> list[tuple[list[int], int]]:
 if __name__ == "__main__":
     # Get an argument for the path
     # Default to "graphs"
-    PATH = sys.argv[1] if len(sys.argv) > 1 else "graphs"
+    PATH = sys.argv[1] if len(sys.argv) > 1 else "tests/branching/"
     # Iterate over all files
     print_iso_auto(PATH)

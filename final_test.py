@@ -1,11 +1,11 @@
 import os
 from timeit import timeit
 
-from count_isomorphisms import check_isomorphism, count_isomorphism
+from src.count_isomorphisms import check_isomorphism, count_isomorphism
 from count_isomorphisms_test import print_iso_auto
-from graph import Graph
-from graph_io import load_graph
-from preprocessing import count_automorphisms
+from src.graph import Graph
+from src.graph_io import load_graph
+from src.preprocessing import count_automorphisms
 
 
 def count_iso(graphs: list[Graph]) -> list[tuple[list[int], int]]:
@@ -65,9 +65,9 @@ if __name__ == '__main__':
     for file in os.scandir("benchmarks/final_test/isomorphism_tests/"):
         print(timeit(lambda: find_iso(file), number=1), "\n", sep="s")
 
-    for file in os.scandir("benchmarks/cref/"):
-        if not file.name.endswith(".grl"):
-            continue
-        print(timeit(lambda: find_iso(file), number=1), "\n", sep="s")
+    # for file in os.scandir("benchmarks/cref/"):
+    #     if not file.name.endswith(".grl"):
+    #         continue
+    #     print(timeit(lambda: find_iso(file), number=1), "\n", sep="s")
 
     # print_iso_without_preprocessing("benchmarks/cref/")

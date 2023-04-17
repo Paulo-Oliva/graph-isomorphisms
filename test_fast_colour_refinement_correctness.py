@@ -1,6 +1,5 @@
-from colour_ref import colour_refinement
-from graph import Edge, Graph, Vertex
-import pytest
+from src.colour_ref import colour_refinement
+from src.graph import Edge, Graph, Vertex
 
 
 def same_group(colouring: dict[Vertex, int], vertices: list[Vertex]):

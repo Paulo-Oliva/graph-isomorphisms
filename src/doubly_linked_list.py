@@ -1,4 +1,4 @@
-from graph import Vertex
+from .graph import Vertex
 
 
 class Node:

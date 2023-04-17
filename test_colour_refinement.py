@@ -1,9 +1,7 @@
-from colour_ref import colour_refinement
-from count_isomorphisms import check_isomorphism
-from graph import Edge, Graph, Vertex
-from graph_io import load_graph
+from src.count_isomorphisms import check_isomorphism
+from src.graph_io import load_graph
 
-GRAPHS_PATH = "./test_graphs/cr_tests/"
+GRAPHS_PATH = "./tests/cref/"
 
 
 def test_colorref_largeexample_4_1026():
