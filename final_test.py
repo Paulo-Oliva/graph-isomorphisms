@@ -49,6 +49,17 @@ def print_aut(file):
         print("{:<11}".format("0"), count_automorphisms(graph))
 
 
+def print_aut2(file):
+    print(file.name)
+    with open(file.path, "r", encoding="utf-8") as grl:
+        graphs, _ = load_graph(grl, read_list=True)
+        i = 0
+        for graph in graphs:
+            print("{:<11}".format("Graph:"), "#Aut:")
+            print("{:<11}".format(i), count_automorphisms(graph))
+            i += 1
+
+
 def print_iso_aut(file):
     print(file.name)
     with open(file.path, "r", encoding="utf-8") as grl:
@@ -63,10 +74,12 @@ def solve(path: str):
         if "Aut" in file.name and "GI" in file.name:
             print(timeit(lambda: print_iso_aut(file), number=1), "\n", sep="s")
 
-        elif "Aut" in file.name:
+        elif "Aut" in file.name and file.name.endswith(".gr"):
             print(timeit(lambda: print_aut(file), number=1), "\n", sep="s")
         elif "GI" in file.name:
             print(timeit(lambda: print_iso(file), number=1), "\n", sep="s")
+        else:
+            print(timeit(lambda: print_aut2(file), number=1), "\n", sep="s")
 
 
 if __name__ == '__main__':
