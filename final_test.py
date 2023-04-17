@@ -1,14 +1,15 @@
 import os
+import sys
 from timeit import timeit
 
-from src.count_isomorphisms import check_isomorphism, count_isomorphism
-from count_isomorphisms_test import print_iso_auto
+from count_isomorphisms_test import count_iso
+from src.count_isomorphisms import check_isomorphism
 from src.graph import Graph
 from src.graph_io import load_graph
 from src.preprocessing import count_automorphisms
 
 
-def count_iso(graphs: list[Graph]) -> list[tuple[list[int], int]]:
+def find_isomorphic_graphs(graphs: list[Graph]) -> list[list[int]]:
     already_checked = {g_inx: False for g_inx in range(len(graphs))}
     iso_groups = []
     for i in range(len(graphs)):
@@ -30,44 +31,44 @@ def count_iso(graphs: list[Graph]) -> list[tuple[list[int], int]]:
     return iso_groups
 
 
-def print_aut(filename):
-    with open("benchmarks/final_test/automorphism_tests/" + filename,
-              "r",
-              encoding="utf-8") as grl:
-        graph = load_graph(grl)
-
-        print("Number of automorphisms: ", count_automorphisms(graph))
-
-
-def print_iso_without_preprocessing(dirname):
-    for file in os.scandir(dirname):
-        if not file.name.endswith(".grl"):
-            continue
-        print(timeit(lambda: find_iso(file), number=1), "\n", sep="s")
-
-
-def find_iso(file):
+def print_iso(file):
+    print(file.name + ":")
     with open(file.path, "r", encoding="utf-8") as grl:
         graphs, _ = load_graph(grl, read_list=True)
-        result = count_iso(graphs)
-        print(file.name + ":")
+        result = find_isomorphic_graphs(graphs)
+        print("Equivalence classes:")
         for group in result:
             print(group)
 
 
+def print_aut(file):
+    print(file.name)
+    with open(file.path, "r", encoding="utf-8") as grl:
+        graph = load_graph(grl)
+        print("{:<11}".format("Graph:"), "#Aut:")
+        print("{:<11}".format("0"), count_automorphisms(graph))
+
+
+def print_iso_aut(file):
+    print(file.name)
+    with open(file.path, "r", encoding="utf-8") as grl:
+        graphs, _ = load_graph(grl, read_list=True)
+        print("{:<27}".format("Equivalence classes:"), "#Aut:")
+        for iso_groups, iso_count in count_iso(graphs):
+            print("{:<27}".format(str(iso_groups)), iso_count)
+
+
+def solve(path: str):
+    for file in os.scandir(path):
+        if "Aut" in file.name and "GI" in file.name:
+            print(timeit(lambda: print_iso_aut(file), number=1), "\n", sep="s")
+
+        elif "Aut" in file.name:
+            print(timeit(lambda: print_aut(file), number=1), "\n", sep="s")
+        elif "GI" in file.name:
+            print(timeit(lambda: print_iso(file), number=1), "\n", sep="s")
+
+
 if __name__ == '__main__':
-    print_iso_auto("benchmarks/final_test/iso_auto_tests/")
-
-    print(timeit(lambda: print_aut("basicAut1.gr"), number=1), "\n", sep="s")
-
-    print(timeit(lambda: print_aut("basicAut2.gr"), number=1), "\n", sep="s")
-
-    for file in os.scandir("benchmarks/final_test/isomorphism_tests/"):
-        print(timeit(lambda: find_iso(file), number=1), "\n", sep="s")
-
-    # for file in os.scandir("benchmarks/cref/"):
-    #     if not file.name.endswith(".grl"):
-    #         continue
-    #     print(timeit(lambda: find_iso(file), number=1), "\n", sep="s")
-
-    # print_iso_without_preprocessing("benchmarks/cref/")
+    PATH = sys.argv[1] if len(sys.argv) > 1 else "input"
+    print("Total time: ", timeit(lambda: solve(PATH), number=1), "s", sep="")

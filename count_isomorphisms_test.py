@@ -24,7 +24,7 @@ def skip_large(file):
         return True
 
 
-def print_iso_auto(path: str):
+def find_iso_aut(path: str):
     """
     This function prints the possible isomorphisms in all the graphs in a
     directory of .grl files. The directory is specified by the path
@@ -84,4 +84,4 @@ if __name__ == "__main__":
     # Default to "graphs"
     PATH = sys.argv[1] if len(sys.argv) > 1 else "tests/branching/"
     # Iterate over all files
-    print_iso_auto(PATH)
+    find_iso_aut(PATH)
