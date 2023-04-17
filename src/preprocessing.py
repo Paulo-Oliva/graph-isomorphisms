@@ -1,10 +1,36 @@
+"""
+This module contains functions for preprocessing the graph.
+
+Moreover, it also contains a function for counting the automorphisms of a
+graph using a preprocessing based on the true and false twins of the graph.
+
+Functions:
+- count_automorphisms: Count the automorphisms of a graph.
+- calc_true_twins: Calculate the true twins of a graph.
+- calc_false_twins: Calculate the false twins of a graph.
+- check_neighbourhood_FT: Check if two vertices are false twins.
+- check_neighbourhood_TT: Check if two vertices are true twins.
+"""
+
 from math import factorial
 
 from .count_isomorphisms import count_isomorphism
-from .graph import *
+from .graph import Graph, Vertex
 
 
 def count_automorphisms(G: Graph) -> int:
+    """
+    Count the automorphisms of a graph.
+
+    This function uses the preprocessing based on the true and false twins of
+    the graph to count the automorphisms of the graph.
+
+    Args:
+        G (Graph): The graph.
+
+    Returns:
+        int: The number of automorphisms of the graph.
+    """
     true_twins = calc_true_twins(G)
     false_twins = calc_false_twins(G)
     colour_counter = 0
@@ -53,31 +79,40 @@ def count_automorphisms(G: Graph) -> int:
             vertices_to_destroy.add(v)
             coloring.pop(v)
 
-    reduce_graph(G, edges_to_destroy, vertices_to_destroy)
+    _reduce_graph(G, edges_to_destroy, vertices_to_destroy)
 
     G_copy = G.copy()
     for i, v in enumerate(G_copy.vertices):
         coloring[v] = coloring[G.vertices[i]]
 
-    return count_isomorphism([], [], G, G_copy, coloring) * calc_multiplier(
+    return count_isomorphism([], [], G, G_copy, coloring) * _calc_multiplier(
         true_twins, false_twins)
 
 
-def reduce_graph(G, edges_to_destroy, vertices_to_destroy):
+def _reduce_graph(G, edges_to_destroy, vertices_to_destroy):
     G._e = list(set(G._e).difference(edges_to_destroy))
     G._v = list(set(G._v).difference(vertices_to_destroy))
 
 
-def calc_multiplier(TT, FT):
-    m = 1
-    for true_twin in TT:
-        m *= factorial(len(true_twin))
-    for false_twin in FT:
-        m *= factorial(len(false_twin))
-    return m
+def _calc_multiplier(true_twins, false_twins) -> int:
+    multiplier = 1
+    for true_twin in true_twins:
+        multiplier *= factorial(len(true_twin))
+    for false_twin in false_twins:
+        multiplier *= factorial(len(false_twin))
+    return multiplier
 
 
-def calc_true_twins(G: Graph):
+def calc_true_twins(G: Graph) -> list:
+    """
+    Return the true twins of a graph.
+
+    Args:
+        G (Graph): The graph.
+
+    Returns:
+        list: The true twins of the graph.
+    """
     vertices = G.vertices
     true_twins = []
     already_checked = {v_inx: False for v_inx in range(len(vertices))}
@@ -98,7 +133,16 @@ def calc_true_twins(G: Graph):
     return true_twins
 
 
-def calc_false_twins(G: Graph):
+def calc_false_twins(G: Graph) -> list:
+    """
+    Return the false twins of a graph.
+
+    Args:
+        G (Graph): The graph.
+
+    Returns:
+        list: The false twins of the graph.
+    """
     vertices = G.vertices
     false_twins = []
     already_checked = {v_inx: False for v_inx in range(len(vertices))}
@@ -119,7 +163,18 @@ def calc_false_twins(G: Graph):
     return false_twins
 
 
-def check_neighbourhood_TT(G: Graph, v: Vertex, u: Vertex):
+def check_neighbourhood_TT(G: Graph, v: Vertex, u: Vertex) -> bool:
+    """
+    Check if two vertices are true twins.
+
+    Args:
+        G (Graph): The graph containing the vertices.
+        v (Vertex): The first vertex.
+        u (Vertex): The second vertex.
+
+    Returns:
+        bool: True if the vertices are true twins, False otherwise.
+    """
     if v.degree != u.degree:
         return False
     if not G.is_adjacent(v, u):
@@ -133,7 +188,18 @@ def check_neighbourhood_TT(G: Graph, v: Vertex, u: Vertex):
     return False
 
 
-def check_neighbourhood_FT(G: Graph, v: Vertex, u: Vertex):
+def check_neighbourhood_FT(G: Graph, v: Vertex, u: Vertex) -> bool:
+    """
+    Check if two vertices are false twins.
+
+    Args:
+        G (Graph): The graph containing the vertices.
+        v (Vertex): The first vertex.
+        u (Vertex): The second vertex.
+
+    Returns:
+        bool: True if the vertices are false twins, False otherwise.
+    """
     if v.degree != u.degree:
         return False
     if G.is_adjacent(v, u):
